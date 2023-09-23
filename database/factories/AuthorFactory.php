@@ -17,7 +17,7 @@ class AuthorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+          'name' => 'Author ' . $this->faker->unique()->numberBetween(1, 10)
         ];
     }
 }

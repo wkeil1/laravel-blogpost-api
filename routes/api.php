@@ -23,3 +23,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::resource('/authors', AuthorController::class);
 Route::resource('/posts', BlogPostController::class);
 Route::get('/published-posts', [BlogPostController::class, 'fetchPublishedPosts']);
+Route::get('/published-posts-unsafe', [BlogPostController::class, 'fetchPublishedPostsUnsafe']);
+Route::get('/published-posts-inefficient', [BlogPostController::class, 'fetchPublishedPostsInefficient']);

@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Author;
+use App\Models\BlogPost;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +14,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+      Author::factory()->count(10)->create()->each(function ($author) {
+        // Create posts for each author as required
+        BlogPost::factory()->count(10)->create([
+            'author_id' => $author->id,
+            'is_published' => true,
+            'status' => 'Approved'
+        ]);
+    });
+    
     }
 }

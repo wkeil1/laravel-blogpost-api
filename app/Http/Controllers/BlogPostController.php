@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BlogPost;
+use Illuminate\Support\Facades\DB;
 
 class BlogPostController extends Controller
 {
@@ -31,6 +32,49 @@ class BlogPostController extends Controller
       $blogPosts = $blogPostQuery->get();
 
       return response()->json($blogPosts);
+    }
+
+    public function fetchPublishedPostsUnsafe(Request $request)
+    {
+      $status = $request->input('status');
+
+      $sql = "SELECT blog_posts.*, authors.id AS author_id, authors.name AS author_name
+              FROM blog_posts 
+              JOIN authors ON blog_posts.author_id = authors.id
+              WHERE blog_posts.is_published = 1 
+              AND blog_posts.status = '$status'";
+
+      // dd($sql);
+      DB::statement($sql);
+
+      $blogPosts = DB::select("SELECT blog_posts.*, authors.id AS author_id, authors.name AS author_name
+              FROM blog_posts 
+              JOIN authors ON blog_posts.author_id = authors.id
+              WHERE blog_posts.is_published = 1 
+              AND blog_posts.status = 'Approved'");
+      return response()->json($blogPosts);
+    }
+
+    public function fetchPublishedPostsInefficient(Request $request)
+    {
+      DB::enableQueryLog();
+      $status = $request->input('status', 'Approved');
+
+      $blogPosts = BlogPost::where('is_published', true)
+        ->where('status', $status)
+        ->get();
+
+      $data = $blogPosts->map(function ($post) {
+          return [
+              'post' => $post,
+              'author_name' => $post->author->name
+          ];
+      });
+      $queries = DB::getQueryLog();
+      return response()->json([
+        'data' => $data,
+        'queries' => $queries
+      ]);
     }
 
     public function store(Request $request)
