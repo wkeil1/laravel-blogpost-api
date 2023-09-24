@@ -23,11 +23,14 @@ class BlogPostController extends Controller
 
       $blogPostQuery = BlogPost::with(['author' => function($query) {
         $query->select('id', 'name'); 
+        // Uncomment the following line to see the SQL query
+        // dd($query->toSql(), $query->getBindings());
       }])
         ->where('is_published', true)
         ->where('status', $status);
 
-      dd($blogPostQuery->toSql(), $blogPostQuery->getBindings());
+      // Uncomment the following line to see the SQL query
+      // dd($blogPostQuery->toSql(), $blogPostQuery->getBindings());
 
       $blogPosts = $blogPostQuery->get();
 
@@ -36,23 +39,20 @@ class BlogPostController extends Controller
 
     public function fetchPublishedPostsUnsafe(Request $request)
     {
-      $status = $request->input('status');
-
-      $sql = "SELECT blog_posts.*, authors.id AS author_id, authors.name AS author_name
-              FROM blog_posts 
-              JOIN authors ON blog_posts.author_id = authors.id
-              WHERE blog_posts.is_published = 1 
-              AND blog_posts.status = '$status'";
-
-      // dd($sql);
-      DB::statement($sql);
-
-      $blogPosts = DB::select("SELECT blog_posts.*, authors.id AS author_id, authors.name AS author_name
-              FROM blog_posts 
-              JOIN authors ON blog_posts.author_id = authors.id
-              WHERE blog_posts.is_published = 1 
-              AND blog_posts.status = 'Approved'");
-      return response()->json($blogPosts);
+        $status = $request->input('status');
+    
+        $sql = "SELECT blog_posts.*, authors.id AS author_id, authors.name AS author_name
+                FROM blog_posts 
+                JOIN authors ON blog_posts.author_id = authors.id
+                WHERE blog_posts.is_published = 1 
+                AND blog_posts.status = '$status'";
+        
+        // Uncomment the following line to see the SQL query
+        dd($sql);
+    
+        $blogPosts = DB::select($sql);
+    
+        return response()->json($blogPosts);
     }
 
     public function fetchPublishedPostsInefficient(Request $request)
